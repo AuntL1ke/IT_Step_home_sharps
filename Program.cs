@@ -9,7 +9,7 @@ namespace HOME
 {
     internal class Program
     {
-        /*static string GetSeason(int month)
+        static string GetSeason(int month)
         {
             switch (month)
             {
@@ -32,11 +32,11 @@ namespace HOME
                 default:
                     return "Unknown season";
             }
-        }   */
+        }   
         static void Main(string[] args)
         {
 
-            /* Console.Write("Input number from 1 to 100 :: ");
+             Console.Write("Input number from 1 to 100 :: ");
              int num = int.Parse(Console.ReadLine());
              if (num >= 0 && num <= 100)
              {
@@ -68,7 +68,7 @@ namespace HOME
             int b = int.Parse(Console.ReadLine());
             Console.Write("input percent :: ");
             int p = int.Parse(Console.ReadLine());
-            Console.WriteLine($"{p}% from {b} is {b * p / 100}"):
+            Console.WriteLine($"{p}% from {b} is {b * p / 100}");
 
 
             Console.WriteLine("Input 4 numbers");
@@ -135,7 +135,7 @@ namespace HOME
             {
                 Console.WriteLine("Incorrect format of date.");
             }
-        }
+        
 
             Console.Write("Input number 1 if you want to convert celsium to faranheight of 2 to converts faranheight to celsium :: ");
             int choice = int.Parse(Console.ReadLine());
@@ -151,7 +151,7 @@ namespace HOME
                     break;
                 default:
                     break;
-            }*/
+            }
 
 
             Console.Write("Input 2 numbers :: ");
