@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace ConsoleApp24
 {
-    internal class Program
+    interface IDisk
     {
-        static void Main(string[] args)
-        {
-        }
+   
+        string Read();
+        void Write(string text);
     }
 }

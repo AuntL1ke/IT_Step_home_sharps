@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace ConsoleApp24
 {
-    internal class Program
+    interface IRemoveableDisk
     {
-        static void Main(string[] args)
-        {
-        }
+        bool HasDisk{get;}
+        void Insert();
+        void Reject();
     }
 }

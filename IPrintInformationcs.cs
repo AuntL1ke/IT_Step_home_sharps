@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace ConsoleApp24
 {
-    internal class Program
+    interface IPrintInformationcs
     {
-        static void Main(string[] args)
-        {
-        }
+        string GetName();
+        void Print(string str);
     }
 }
