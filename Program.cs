@@ -1,210 +1,218 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.IO;
+using System.Text;
+using System.Threading.Tasks;
 
-class CmdLine
+namespace Delag
 {
-    private static string currentPath = Directory.GetCurrentDirectory();
-    private static string previousPath = null;
-
-    public static void ExecuteCommand(string command)
+    class Product
     {
-        string[] tokens = command.Split(' ');
+        public string Name { get; set; }
+        public double Price { get; set; }
 
-        switch (tokens[0].ToLower())
+        public Product(string name, double price)
         {
-            case "md":
-                CreateFolder(tokens[1]);
-                break;
-            case "rd":
-                DeleteFolder(tokens[1]);
-                break;
-            case "cd":
-                ChangeDirectory(tokens[1]);
-                break;
-            case "dir":
-                ListDirectoryContents();
-                break;
-            case "create":
-                CreateTextFile(tokens[1]);
-                break;
-            case "type":
-                ViewFileContents(tokens[1]);
-                break;
-            case "copy":
-                CopyFile(tokens[1], tokens[2]);
-                break;
-            case "del":
-                DeleteFile(tokens[1]);
-                break;
-            case "append":
-                AppendToFile(tokens[1]);
-                break;
-            case "back":
-                GoBack();
-                break;
-            default:
-                Console.WriteLine("Invalid command");
-                break;
+            Name = name;
+            Price = price;
+        }
+
+        public override string ToString()
+        {
+            return $"{Name}: ${Price}";
         }
     }
-
-    static void CreateFolder(string folderName)
+    class Calculator
     {
-        string fullPath = Path.Combine(currentPath, folderName);
-        Directory.CreateDirectory(fullPath);
-        Console.WriteLine($"Folder '{fullPath}' created");
-    }
-
-    static void DeleteFolder(string folderName)
-    {
-        string fullPath = Path.Combine(currentPath, folderName);
-        if (Directory.Exists(fullPath))
+        private Func<double, double, double> func;
+        public enum Operation
         {
-            Directory.Delete(fullPath);
-            Console.WriteLine($"Folder '{fullPath}' deleted");
+            Plus,
+            Minus,
+            Mult,
+            Div
         }
-        else
+        public void SetOperation(Operation op)
         {
-            Console.WriteLine($"Folder '{fullPath}' does not exist");
-        }
-    }
-
-    static void ChangeDirectory(string folderName)
-    {
-        string fullPath = Path.Combine(currentPath, folderName);
-        if (Directory.Exists(fullPath))
-        {
-            previousPath = currentPath;
-            currentPath = fullPath;
-            Console.WriteLine($"Current directory changed to '{fullPath}'");
-        }
-        else
-        {
-            Console.WriteLine($"Directory '{fullPath}' does not exist");
-        }
-    }
-
-    static void GoBack()
-    {
-        if (previousPath != null)
-        {
-            currentPath = previousPath;
-            previousPath = null;
-            Console.WriteLine($"Returned to the previous directory: '{currentPath}'");
-        }
-        else
-        {
-            Console.WriteLine("There is no previous directory to go back to.");
-        }
-    }
-
-    static void ListDirectoryContents()
-    {
-        string[] files = Directory.GetFiles(currentPath);
-        string[] directories = Directory.GetDirectories(currentPath);
-
-        Console.WriteLine($"Files and directories in '{currentPath}':");
-        Console.WriteLine("Files:");
-        foreach (string file in files)
-        {
-            Console.WriteLine(file);
-        }
-
-        Console.WriteLine("\nDirectories:");
-        foreach (string directory in directories)
-        {
-            Console.WriteLine(directory);
-        }
-    }
-
-    static void CreateTextFile(string fileName)
-    {
-        string fullPath = Path.Combine(currentPath, fileName);
-
-        Console.Write($"Enter text for the file '{fullPath}': ");
-        string content = Console.ReadLine();
-
-        File.WriteAllText(fullPath, content);
-        Console.WriteLine($"Text file '{fullPath}' created");
-    }
-
-    static void ViewFileContents(string fileName)
-    {
-        string fullPath = Path.Combine(currentPath, fileName);
-        if (File.Exists(fullPath))
-        {
-            string content = File.ReadAllText(fullPath);
-            Console.WriteLine($"Contents of '{fullPath}':\n{content}");
-        }
-        else
-        {
-            Console.WriteLine($"File '{fullPath}' does not exist");
-        }
-    }
-
-    static void CopyFile(string sourceFileName, string destinationFileName)
-    {
-        string sourceFullPath = Path.Combine(currentPath, sourceFileName);
-        string destinationFullPath = Path.Combine(currentPath, destinationFileName);
-
-        if (File.Exists(sourceFullPath))
-        {
-            File.Copy(sourceFullPath, destinationFullPath, true);
-            Console.WriteLine($"File '{sourceFullPath}' copied to '{destinationFullPath}'");
-        }
-        else
-        {
-            Console.WriteLine($"File '{sourceFullPath}' does not exist");
-        }
-    }
-
-    static void DeleteFile(string fileName)
-    {
-        string fullPath = Path.Combine(currentPath, fileName);
-        if (File.Exists(fullPath))
-        {
-            File.Delete(fullPath);
-            Console.WriteLine($"File '{fullPath}' deleted");
-        }
-        else
-        {
-            Console.WriteLine($"File '{fullPath}' does not exist");
-        }
-    }
-
-    static void AppendToFile(string fileName)
-    {
-        string fullPath = Path.Combine(currentPath, fileName);
-        if (File.Exists(fullPath))
-        {
-            Console.Write($"Enter text to append to the file '{fullPath}': ");
-            string content = Console.ReadLine();
-
-            File.AppendAllText(fullPath, content);
-            Console.WriteLine($"Text appended to '{fullPath}'");
-        }
-        else
-        {
-            Console.WriteLine($"File '{fullPath}' does not exist");
-        }
-    }
-}
-
-class Program
-{
-    static void Main()
-    {
-        while (true)
-        {
-            Console.Write("Enter command (or 'exit' to quit): ");
-            string command = Console.ReadLine();
-
-            if (command.ToLower() == "exit")
+            if(op == Operation.Plus)
             {
-                break;
+                this.func = (a, b) => a + b;
+            }
+            else if(op==Operation.Minus)
+            {
+                this.func = (a, b) => a - b;
+
+            }
+            else if(op==Operation.Mult)
+            {
+                this.func = (a, b) => a * b;
+
+            }else if(op==Operation.Div)
+            {
+                this.func = (a, b) => b != 0 ? a / b : throw new ArgumentException("cannot divide by zero");
+
+            }
+            else
+            {
+                throw new ArgumentException("Invalid operation");
+            }
+        }
+        public double Calculate(double one, double two)
+        {
+            if (func == null)
+            { throw new InvalidOperationException("Operation not set. Call SetOperation method first."); }
+            else
+            {
+                return func(one, two);
             }
 
-            CmdLine.ExecuteCommand(command);
+        }
+
+    }
+    class Program
+    {
+        static void DrawSquare(uint height, ConsoleColor color, char symbol)
+        {
+
+            Console.ForegroundColor = color;
+            for(uint i=0;i<height;i++)
+            {
+                for(uint j=0;j<height;j++)
+                {
+                    Console.Write(symbol);
+                }
+                Console.WriteLine();
+            }
+        }
+        static void DrawTriangle(uint height, ConsoleColor color, char symbol)
+        {
+            Console.ForegroundColor = color;
+            for(uint i=0;i<height;i++)
+            {
+                for(uint j=0;j<=i;j++)
+                {
+                    Console.Write(symbol);
+                }
+                Console.WriteLine();
+
+            }
+        }
+
+        static int CompareByPrice(Product p1, Product p2)
+        {
+            return p1.Price.CompareTo(p2.Price);
+        }
+
+        delegate void Delag(uint height, ConsoleColor color, char symbol);
+
+        static void Sort<T>(T[] arr, Comparison<T> comp)
+        {
+            int n = arr.Length;
+            for (int i = 0; i < n - 1; i++)
+            {
+                for (int j = 0; j < n - i - 1; j++)
+                {
+                    if (comp(arr[j], arr[j + 1]) > 0)
+                    {
+      
+                        T temp = arr[j];
+                        arr[j] = arr[j + 1];
+                        arr[j + 1] = temp;
+                    }
+                }
+            }
+        }
+
+        static void Main(string[] args)
+        {
+            DrawSquare(5, ConsoleColor.Red, '*');
+            Console.WriteLine();
+            DrawTriangle(5, ConsoleColor.DarkCyan, '+');
+            Console.WriteLine();
+
+            Delag delag;
+
+            delag = DrawSquare;
+            delag(5, ConsoleColor.Green, '$');
+            Console.WriteLine();
+
+            delag = DrawTriangle;
+            delag(5, ConsoleColor.Magenta, '&');
+            Console.WriteLine();
+
+            Delag multidelag;
+
+            multidelag = DrawSquare;
+
+            multidelag += DrawTriangle;
+
+            multidelag(5, ConsoleColor.DarkYellow, '!');
+
+            Calculator calculator = new Calculator();
+
+
+            calculator.SetOperation(Calculator.Operation.Plus);
+            double result = calculator.Calculate(5, 3);
+            Console.WriteLine("Result: " + result);
+
+            calculator.SetOperation(Calculator.Operation.Minus);
+            result = calculator.Calculate(5, 3);
+            Console.WriteLine("Result: " + result);
+
+
+            calculator.SetOperation(Calculator.Operation.Mult);
+            result = calculator.Calculate(5, 3);
+            Console.WriteLine("Result: " + result);
+
+
+            calculator.SetOperation(Calculator.Operation.Div);
+            result = calculator.Calculate(5, 3);
+            Console.WriteLine("Result: " + result);
+
+            string[] strings = { "apple", "banana", "kiwi", "orange", "grape" };
+
+            Console.WriteLine("Before sorting:");
+            foreach (var str in strings)
+            {
+                Console.Write(str + " ");
+            }
+
+       
+            Sort(strings, (s1, s2) => s1.Length.CompareTo(s2.Length));
+
+            Console.WriteLine("\nAfter sorting by length:");
+            foreach (var str in strings)
+            {
+                Console.Write(str + " ");
+            }
+
+      
+            Product[] products = {
+            new Product("Laptop", 1200),
+            new Product("Phone", 800),
+            new Product("Tablet", 500),
+            new Product("TV", 1500),
+            new Product("Camera", 700)
+        };
+
+            Console.WriteLine("\n\nBefore sorting:");
+            foreach (var product in products)
+            {
+                Console.WriteLine(product);
+            }
+
+            Sort(products, CompareByPrice);
+
+            Console.WriteLine("\nAfter sorting by price:");
+            foreach (var product in products)
+            {
+                Console.WriteLine(product);
+            }
+
         }
     }
+
+
 }
+
